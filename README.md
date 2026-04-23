@@ -16,6 +16,12 @@
 
 ---
 
+<div align="center">
+  <img src="demo.gif" alt="SmartSite Demo" width="800"/>
+</div>
+
+---
+
 ## 🔍 Overview
 
 SmartSite is an end-to-end geospatial analytics platform. The system addresses a real-world problem: *how do you objectively evaluate the business potential of an urban location without relying purely on gut instinct?*
@@ -104,7 +110,6 @@ The platform ingests multi-source spatial data - including Google Maps café rev
 | **GeoJSON built on-the-fly** | Grid polygons are constructed server-side from center coordinates with a fixed half-size `HALF = 0.0025°`, keeping the stored CSV lightweight |
 | **GeoPandas spatial join for clipping** | After loading, grid points are clipped to land polygons from the population GeoJSON files to eliminate ocean/water cells |
 | **Goong Maps (Mapbox-compatible)** | Vietnamese-language tile service with Mapbox GL JS API compatibility, allowing use of standard layer/source patterns |
-| **Graceful degradation** | If a data file is missing, each service falls back to deterministic mock data so the UI remains functional during development |
 
 ---
 

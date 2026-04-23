@@ -1,4 +1,4 @@
-import { TrendingUp, Target, Smile, Zap } from 'lucide-react'
+import { Target, Smile, Zap, BarChart3 } from 'lucide-react'
 import type { MacroStats } from '../../types'
 
 interface Props { data: MacroStats }
@@ -8,22 +8,22 @@ export default function MacroKPIRow({ data }: Props) {
         {
             label: 'QUY MÔ THỊ TRƯỜNG',
             value: data.total_cafes.toLocaleString(),
-            sub: '+5.2% với Q2',
-            subColor: 'text-green-500',
+            sub: `Phủ sóng ${data.coverage_pct}%`,
+            subColor: 'text-blue-400',
             icon: <Target size={28} className="text-gray-200" />,
         },
         {
             label: 'HOTSPOTS LOẠI A+',
             value: String(data.hotspot_a_plus),
-            sub: 'Đã kiểm định AI',
+            sub: `Trong ${data.total_reviews.toLocaleString()} đánh giá`,
             subColor: 'text-blue-400',
-            icon: <Target size={28} className="text-gray-200" />,
+            icon: <BarChart3 size={28} className="text-gray-200" />,
         },
         {
             label: 'CHỈ SỐ SENTIMENT',
             value: `${data.sentiment}/5.0`,
-            sub: 'Dư địa lớn',
-            subColor: 'text-orange-400',
+            sub: `Rating TB: ${data.avg_rating}★`,
+            subColor: data.sentiment >= 3.5 ? 'text-green-500' : 'text-orange-400',
             icon: <Smile size={28} className="text-gray-200" />,
         },
         {
@@ -55,8 +55,7 @@ export default function MacroKPIRow({ data }: Props) {
                             </div>
                         )}
                         {item.sub && (
-                            <p className={`text-xs mt-1.5 flex items-center gap-1 ${item.subColor}`}>
-                                {i === 0 && <TrendingUp size={12} />}
+                            <p className={`text-xs mt-1.5 ${item.subColor}`}>
                                 {item.sub}
                             </p>
                         )}

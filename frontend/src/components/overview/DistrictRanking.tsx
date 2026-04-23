@@ -1,12 +1,9 @@
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import type { DistrictRankItem } from '../../types'
 
-const DISTRICTS = [
-    { name: 'Hải Châu', score: 95, trend: 'up' },
-    { name: 'Thanh Khê', score: 88, trend: 'up' },
-    { name: 'Sơn Trà', score: 82, trend: 'flat' },
-    { name: 'Ngũ Hành Sơn', score: 75, trend: 'up' },
-    { name: 'Cẩm Lệ', score: 68, trend: 'down' },
-]
+interface Props {
+    data: DistrictRankItem[]
+}
 
 const TrendIcon = ({ trend }: { trend: string }) => {
     if (trend === 'up') return <TrendingUp size={14} className="text-blue-500" />
@@ -14,7 +11,18 @@ const TrendIcon = ({ trend }: { trend: string }) => {
     return <Minus size={14} className="text-gray-400" />
 }
 
-export default function DistrictRanking() {
+export default function DistrictRanking({ data }: Props) {
+    if (!data || data.length === 0) {
+        return (
+            <div className="bg-white rounded-2xl p-5 border border-gray-100 h-full flex items-center justify-center">
+                <p className="text-sm text-gray-400">Đang tải dữ liệu…</p>
+            </div>
+        )
+    }
+
+    // Chỉ hiển thị top 5
+    const top = data.slice(0, 5)
+
     return (
         <div className="bg-white rounded-2xl p-5 border border-gray-100 h-full">
             <p className="text-sm font-semibold text-gray-800">Xếp hạng Tiềm năng Quận</p>
@@ -23,7 +31,7 @@ export default function DistrictRanking() {
                 <div className="grid grid-cols-3 text-[10px] text-gray-400 uppercase tracking-wider px-1 pb-1 border-b border-gray-100">
                     <span>Quận</span><span className="text-center">Điểm</span><span className="text-right">Xu hướng</span>
                 </div>
-                {DISTRICTS.map((d, i) => (
+                {top.map((d) => (
                     <div key={d.name} className="grid grid-cols-3 items-center py-3 px-1 rounded-lg hover:bg-gray-50 transition-colors">
                         <span className="text-base text-gray-700">{d.name}</span>
                         <span className="text-center text-base font-semibold text-blue-600">{d.score}</span>

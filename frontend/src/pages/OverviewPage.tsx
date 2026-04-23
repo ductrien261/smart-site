@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import { statsApi } from '../services/api'
-import type { MacroStats, CityCompare, MarketGap } from '../types'
+import type {
+  MacroStats, CityCompare, MarketGap,
+  SentimentItem, DistrictRankItem, POIEcosystemItem,
+  RegionLinkageItem, StrategyStats
+} from '../types'
 
 import MacroKPIRow from '../components/overview/MacroKPIRow'
 import POIEcosystem from '../components/overview/POIEcosystem'
@@ -15,6 +19,11 @@ export default function OverviewPage() {
   const [macro, setMacro] = useState<MacroStats | null>(null)
   const [cityData, setCityData] = useState<CityCompare[]>([])
   const [gapData, setGapData] = useState<MarketGap[]>([])
+  const [sentimentData, setSentimentData] = useState<SentimentItem[]>([])
+  const [districtData, setDistrictData] = useState<DistrictRankItem[]>([])
+  const [poiData, setPoiData] = useState<POIEcosystemItem[]>([])
+  const [regionData, setRegionData] = useState<RegionLinkageItem[]>([])
+  const [strategyData, setStrategyData] = useState<StrategyStats | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -22,10 +31,20 @@ export default function OverviewPage() {
       statsApi.getMacro(),
       statsApi.getCityCompare(),
       statsApi.getMarketGap(),
-    ]).then(([m, c, g]) => {
+      statsApi.getSentiment(),
+      statsApi.getDistrictRanking(),
+      statsApi.getPoiEcosystem(),
+      statsApi.getRegionLinkage(),
+      statsApi.getStrategyStats(),
+    ]).then(([m, c, g, s, d, p, r, st]) => {
       setMacro(m.data)
       setCityData(c.data)
       setGapData(g.data)
+      setSentimentData(s.data)
+      setDistrictData(d.data)
+      setPoiData(p.data)
+      setRegionData(r.data)
+      setStrategyData(st.data)
     }).finally(() => setLoading(false))
   }, [])
 
@@ -52,15 +71,15 @@ export default function OverviewPage() {
 
       {/* Row 2: POI + Sentiment + District */}
       <div className="grid grid-cols-3 gap-4 mb-4">
-        <POIEcosystem />
-        <SentimentDonut />
-        <DistrictRanking />
+        <POIEcosystem data={poiData} />
+        <SentimentDonut data={sentimentData} />
+        <DistrictRanking data={districtData} />
       </div>
 
       {/* Row 3: Region Linkage + Strategy */}
       <div className="grid grid-cols-3 gap-4 mb-4">
-        <div className="col-span-2"><RegionLinkage /></div>
-        <StrategyCards />
+        <div className="col-span-2"><RegionLinkage data={regionData} /></div>
+        <StrategyCards data={strategyData} />
       </div>
 
       {/* Row 4: City Compare */}

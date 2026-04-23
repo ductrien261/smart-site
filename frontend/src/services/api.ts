@@ -6,6 +6,11 @@ export const statsApi = {
   getMacro: (city = 'all') => api.get('/stats/macro', { params: { city } }),
   getCityCompare: () => api.get('/stats/city-compare'),
   getMarketGap: () => api.get('/stats/market-gap'),
+  getSentiment: (city = 'all') => api.get('/stats/sentiment', { params: { city } }),
+  getDistrictRanking: (city = 'DaNang') => api.get('/stats/district-ranking', { params: { city } }),
+  getPoiEcosystem: (city = 'DaNang') => api.get('/stats/poi-ecosystem', { params: { city } }),
+  getRegionLinkage: () => api.get('/stats/region-linkage'),
+  getStrategyStats: (city = 'all') => api.get('/stats/strategy-stats', { params: { city } }),
 }
 
 export const gridApi = {
