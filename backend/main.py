@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api.routes import grid, poi, stats, analysis
+from api.routes import grid, poi, stats, analysis, competition, population
 
 app = FastAPI(title="SmartSite API", version="1.0.0")
 
@@ -15,6 +15,8 @@ app.include_router(stats.router, prefix="/api/stats", tags=["stats"])
 app.include_router(grid.router,  prefix="/api/grid",  tags=["grid"])
 app.include_router(poi.router,   prefix="/api/poi",   tags=["poi"])
 app.include_router(analysis.router, prefix="/api/analysis", tags=["analysis"])
+app.include_router(competition.router, prefix="/api/competition", tags=["competition"])
+app.include_router(population.router, prefix="/api/population", tags=["population"])
 
 @app.get("/")
 def root():

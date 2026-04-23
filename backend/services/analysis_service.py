@@ -1,51 +1,98 @@
 import pandas as pd
 import numpy as np
-from config import PROCESSED_DIR, OUTPUTS_DIR
+import json
+from config import PROCESSED_DIR
 
+_cafe_cache = None
+_poi_cache  = None
 
 def _load_cafe():
+    global _cafe_cache
+    if _cafe_cache is not None:
+        return _cafe_cache
+
     path = PROCESSED_DIR / "Coffee_Tea_Data_GGMap.csv"
-    if path.exists():
-        return pd.read_csv(path)
+    if not path.exists():
+        print(f"⚠️  Coffee_Tea_Data_GGMap.csv not found, using mock")
+        _cafe_cache = _mock_cafe()
+        return _cafe_cache
+
+    df = pd.read_csv(path)
+    print(f"✅ Loaded Coffee_Tea_Data_GGMap.csv — {len(df)} rows")
+
+    # Đảm bảo cột cần thiết
+    if 'sentiment_score_final' not in df.columns:
+        df['sentiment_score_final'] = 0.5
+    if 'rating' not in df.columns:
+        df['rating'] = 0.0
+    if 'reviews_count' not in df.columns:
+        df['reviews_count'] = 0
+
+    df['lat'] = pd.to_numeric(df['lat'], errors='coerce')
+    df['lng'] = pd.to_numeric(df['lng'], errors='coerce')
+    df = df.dropna(subset=['lat','lng'])
+
+    _cafe_cache = df
+    return _cafe_cache
+
+
+def _load_poi():
+    global _poi_cache
+    if _poi_cache is not None:
+        return _poi_cache
+
+    path = PROCESSED_DIR / "Coffee_Tea_Data_POI.geojson"
+    if not path.exists():
+        print(f"⚠️  Coffee_Tea_Data_POI.geojson not found, using mock")
+        _poi_cache = _mock_poi()
+        return _poi_cache
+
+    with open(path, encoding='utf-8') as f:
+        data = json.load(f)
+
+    rows = []
+    for ft in data.get("features", []):
+        props  = ft.get("properties", {})
+        coords = ft.get("geometry", {}).get("coordinates", [None, None])
+        if coords[0] is None:
+            continue
+        rows.append({
+            "City":           props.get("City", ""),
+            "lon":            float(coords[0]),
+            "lat":            float(coords[1]),
+            "Category_Clean": props.get("Category_Clean", "Other"),
+        })
+
+    df = pd.DataFrame(rows)
+    print(f"✅ Loaded Coffee_Tea_Data_POI.geojson — {len(df)} rows")
+    _poi_cache = df
+    return _poi_cache
+
+
+def _mock_cafe():
     np.random.seed(42)
     n = 500
     return pd.DataFrame({
-        "name":           [f"Quán {i}" for i in range(n)],
-        "City":           ["DaNang"]*200 + ["HCM"]*200 + ["HaNoi"]*100,
-        "lat":            np.random.uniform(15.9, 16.2, n),
-        "lng":            np.random.uniform(108.0, 108.4, n),
-        "rating":         np.random.uniform(3.0, 5.0, n),
-        "reviews_count":  np.random.randint(5, 3000, n),
+        "City":                  ["DaNang"]*200 + ["HCM"]*200 + ["HaNoi"]*100,
+        "lat":                   np.random.uniform(15.9, 16.2, n),
+        "lng":                   np.random.uniform(108.0, 108.4, n),
+        "rating":                np.random.uniform(3.0, 5.0, n),
+        "reviews_count":         np.random.randint(5, 3000, n),
         "sentiment_score_final": np.random.uniform(0.0, 1.0, n),
     })
 
 
-def _load_poi():
-    import json
-    path = PROCESSED_DIR / "Coffee_Tea_Data_POI.geojson"
-    if not path.exists():
-        return pd.DataFrame({
-            "City": ["DaNang"]*300,
-            "lat":  np.random.uniform(15.9, 16.2, 300),
-            "lon":  np.random.uniform(108.0, 108.4, 300),
-            "Category_Clean": np.random.choice(
-                ["Food", "Commercial", "Leisure", "Transport",
-                    "Office", "Education", "Residential"], 300
-            ),
-        })
-    with open(path) as f:
-        data = json.load(f)
-    rows = []
-    for ft in data.get("features", []):
-        props = ft.get("properties", {})
-        coords = ft.get("geometry", {}).get("coordinates", [None, None])
-        rows.append({
-            "City":           props.get("City", ""),
-            "lon":            coords[0],
-            "lat":            coords[1],
-            "Category_Clean": props.get("Category_Clean", "Other"),
-        })
-    return pd.DataFrame(rows)
+def _mock_poi():
+    np.random.seed(42)
+    n = 300
+    return pd.DataFrame({
+        "City": ["DaNang"]*n,
+        "lat":  np.random.uniform(15.9, 16.2, n),
+        "lon":  np.random.uniform(108.0, 108.4, n),
+        "Category_Clean": np.random.choice(
+            ["Food","Commercial","Leisure","Transport","Office","Education","Residential"], n
+        ),
+    })
 
 
 def _competition_meta(n: int):

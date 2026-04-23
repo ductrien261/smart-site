@@ -14,7 +14,7 @@ export function flyToCenter(map: any, center: any, zoom = 14, duration = 1000) {
 }
 
 export function setGeoJSONSource(map: any, sourceId: string, geojsonData: any) {
-  if (!map) return
+  if (!map || !map.getStyle || !map.getStyle()) return
   const existing = map.getSource(sourceId)
   if (existing) {
     existing.setData(geojsonData)
@@ -24,7 +24,7 @@ export function setGeoJSONSource(map: any, sourceId: string, geojsonData: any) {
 }
 
 export function removeSourceAndLayers(map: any, sourceId: string, layerIds: string[] = []) {
-  if (!map) return
+  if (!map || !map.getStyle || !map.getStyle()) return
   for (const layerId of layerIds) {
     if (map.getLayer(layerId)) map.removeLayer(layerId)
   }

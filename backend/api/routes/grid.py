@@ -3,7 +3,7 @@ from services.grid_service import get_grids, get_grid_geojson
 
 router = APIRouter()
 
-@router.get("/")
+@router.get("")
 def grids(
     city: str = Query(default="DaNang"),
     district: str = Query(default=None),

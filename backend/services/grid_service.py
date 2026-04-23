@@ -1,12 +1,75 @@
 import pandas as pd
 import numpy as np
-from config import OUTPUTS_DIR
+import os
+from config import OUTPUTS_DIR, PROCESSED_DIR
+import geopandas as gpd
+from shapely.geometry import Point
+from pathlib import Path
 
-def _load():
+_grid_cache: pd.DataFrame | None = None
+
+def _load() -> pd.DataFrame:
+    global _grid_cache
+    if _grid_cache is not None:
+        return _grid_cache
+
     path = OUTPUTS_DIR / "Grid_Predictions.csv"
-    if path.exists():
-        return pd.read_csv(path)
-    # Mock
+    if not path.exists():
+        print(f"⚠️  Grid_Predictions.csv not found at {path}, using mock data")
+        _grid_cache = _mock_data()
+        return _grid_cache
+
+    df = pd.read_csv(path)
+    print(f"✅ Loaded Grid_Predictions.csv — {len(df)} rows")
+
+    required = ['Grid_ID','City','Center_Lat','Center_Lng',
+                'Cafe_Count','Total_Reviews','NTL_Mean',
+                'POI_Density','Score','Score_Class']
+    for col in required:
+        if col not in df.columns:
+            df[col] = 0
+
+    if 'District' not in df.columns:
+        df['District'] = 'Unknown'
+
+    # Fill NaN
+    df['Cafe_Count']    = df['Cafe_Count'].fillna(0).astype(int)
+    df['Total_Reviews'] = df['Total_Reviews'].fillna(0).astype(int)
+    df['NTL_Mean']      = df['NTL_Mean'].fillna(0).astype(float)
+    df['POI_Density']   = df['POI_Density'].fillna(0).astype(float)
+    df['Score']         = df['Score'].fillna(0).astype(float)
+    df['Score_Class']   = df['Score_Class'].fillna(0).astype(int)
+
+    pop_dir = OUTPUTS_DIR.parent / "population"
+    city_files = {
+        'DaNang': pop_dir / 'danang_population.geojson',
+        'HCM':    pop_dir / 'hcm_population.geojson',
+        'HaNoi':  pop_dir / 'hn_population.geojson',
+    }
+    gdfs = []
+    for city_name, fpath in city_files.items():
+        if fpath.exists():
+            gdf = gpd.read_file(fpath)
+            gdf['_city'] = city_name
+            gdfs.append(gdf[['geometry', '_city']])
+
+    if gdfs:
+        land_gdf = gpd.GeoDataFrame(pd.concat(gdfs, ignore_index=True), crs='EPSG:4326')
+        points_gdf = gpd.GeoDataFrame(
+            df,
+            geometry=gpd.points_from_xy(df['Center_Lng'], df['Center_Lat']),
+            crs='EPSG:4326'
+        )
+        joined = gpd.sjoin(points_gdf, land_gdf, how='inner', predicate='within')
+        before = len(df)
+        df = df.loc[joined.index.unique()].reset_index(drop=True)
+        print(f"✅ Clipped: {before} → {len(df)} rows")
+
+    _grid_cache = df
+    return _grid_cache
+
+
+def _mock_data() -> pd.DataFrame:
     np.random.seed(42)
     n = 200
     return pd.DataFrame({
@@ -23,9 +86,10 @@ def _load():
         "Center_Lng":   np.random.uniform(108.1, 108.3, n),
     })
 
+
 def get_grids(city, district, min_cafes, max_cafes, sort_by, page, page_size):
     df = _load()
-    df = df[df["City"] == city]
+    df = df[df["City"] == city].copy()
     if district:
         df = df[df["District"] == district]
     if min_cafes:
@@ -36,9 +100,9 @@ def get_grids(city, district, min_cafes, max_cafes, sort_by, page, page_size):
     sort_col = {"score": "Score", "cafes": "Cafe_Count", "reviews": "Total_Reviews"}.get(sort_by, "Score")
     df = df.sort_values(sort_col, ascending=False)
 
-    total  = len(df)
-    start  = (page - 1) * page_size
-    paged  = df.iloc[start: start + page_size]
+    total = len(df)
+    start = (page - 1) * page_size
+    paged = df.iloc[start: start + page_size]
 
     return {
         "total":     total,
@@ -47,35 +111,31 @@ def get_grids(city, district, min_cafes, max_cafes, sort_by, page, page_size):
         "items":     paged.to_dict(orient="records"),
     }
 
+
 def get_grid_geojson(city: str, district: str = None):
     df = _load()
-    df = df[df["City"] == city]
+    df = df[df["City"] == city].copy()
     if district:
         df = df[df["District"] == district]
 
+    HALF = 0.0025
     features = []
-    HALF = 0.0025  # ~250m mỗi chiều, khớp với step grid colab
-
     for _, row in df.iterrows():
-        lat = row["Center_Lat"]
-        lng = row["Center_Lng"]
-        score = float(row["Score"])
-
+        lat  = float(row["Center_Lat"])
+        lng  = float(row["Center_Lng"])
         features.append({
             "type": "Feature",
             "geometry": {
                 "type": "Polygon",
                 "coordinates": [[
-                    [lng - HALF, lat - HALF],
-                    [lng + HALF, lat - HALF],
-                    [lng + HALF, lat + HALF],
-                    [lng - HALF, lat + HALF],
-                    [lng - HALF, lat - HALF],
+                    [lng-HALF, lat-HALF], [lng+HALF, lat-HALF],
+                    [lng+HALF, lat+HALF], [lng-HALF, lat+HALF],
+                    [lng-HALF, lat-HALF],
                 ]]
             },
             "properties": {
                 "Grid_ID":       str(row["Grid_ID"]),
-                "Score":         score,
+                "Score":         round(float(row["Score"]), 2),
                 "Score_Class":   int(row["Score_Class"]),
                 "Cafe_Count":    int(row["Cafe_Count"]),
                 "Total_Reviews": int(row["Total_Reviews"]),

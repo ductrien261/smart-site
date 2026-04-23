@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Map, BarChart3 } from 'lucide-react'
+import { LayoutDashboard, Map, BarChart3, TrendingUp } from 'lucide-react'
 
 const nav = [
   { to: '/overview', icon: LayoutDashboard, label: 'Tổng quan Vĩ mô' },
-  { to: '/map',      icon: Map,             label: 'Bản đồ Thẩm định' },
-  { to: '/analysis', icon: BarChart3,        label: 'Cảnh quan Cạnh tranh' },
+  { to: '/map', icon: Map, label: 'Bản đồ Thẩm định' },
+  { to: '/competition', icon: TrendingUp, label: 'Cảnh quan Cạnh tranh' },
+  { to: '/analysis', icon: BarChart3, label: 'Phân tích Vị trí' },
 ]
 
 export default function Sidebar() {
@@ -33,10 +34,9 @@ export default function Sidebar() {
             key={to}
             to={to}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-xl text-base transition-colors ${
-                isActive
-                  ? 'bg-blue-50 text-blue-600 font-semibold'
-                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
+              `flex items-center gap-3 px-4 py-3 rounded-xl text-base transition-colors ${isActive
+                ? 'bg-blue-50 text-blue-600 font-semibold'
+                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-700'
               }`
             }
           >
