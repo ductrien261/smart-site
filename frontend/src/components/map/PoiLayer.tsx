@@ -42,6 +42,9 @@ export default function PoiLayer({ mapInstance, mapReady, geojson }: Props) {
                     'circle-stroke-color': '#fff',
                 }
             })
+            if (map.getLayer('population-density-fill')) map.moveLayer('population-density-fill')
+            if (map.getLayer('population-density-line')) map.moveLayer('population-density-line')
+            if (map.getLayer('population-heatmap')) map.moveLayer('population-heatmap')
             addedRef.current = true
         }
 

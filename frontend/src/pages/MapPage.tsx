@@ -15,6 +15,7 @@ const CITY_OPTIONS = [
 ]
 
 type ViewMode = 'grid' | 'point'
+type PopDensityMode = 'choropleth' | 'heatmap'
 
 export default function MapPage() {
   const [city, setCity] = useState('DaNang')
@@ -27,6 +28,7 @@ export default function MapPage() {
   const [mapReady, setMapReady] = useState(false)
   const [loading, setLoading] = useState(false)
   const [showDensity, setShowDensity] = useState(false)
+  const [popDensityMode, setPopDensityMode] = useState<PopDensityMode>('choropleth')
   const [poiGeojson, setPoiGeojson] = useState<any>(null)
   const [popGeojson, setPopGeojson] = useState<any>(null)
   const [selectedGrid, setSelectedGrid] = useState<any>(null)
@@ -106,7 +108,7 @@ export default function MapPage() {
                 className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${viewMode === m ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
                   }`}
               >
-                {m === 'grid' ? '▦ Mặt độ' : '• Điểm'}
+                {m === 'grid' ? '▦ Mặt độ' : '• Điểm POI'}
               </button>
             ))}
           </div>
@@ -134,6 +136,24 @@ export default function MapPage() {
           >
             👥 Mật độ dân số {showDensity ? 'BẬT' : 'TẮT'}
           </button>
+
+          {/* Population density mode toggle */}
+          {showDensity && (
+            <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
+              <button
+                onClick={() => setPopDensityMode('choropleth')}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${popDensityMode === 'choropleth' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                🗺️ Ranh giới
+              </button>
+              <button
+                onClick={() => setPopDensityMode('heatmap')}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${popDensityMode === 'heatmap' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+              >
+                🔥 Nhiệt độ
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -165,12 +185,13 @@ export default function MapPage() {
               className="w-full h-full"
               onMapReady={handleMapReady}
             />
-            {mapReady && popGeojson && showDensity && (
+            {mapReady && popGeojson && (
               <PopulationLayer
                 mapInstance={mapRef.current}
                 mapReady={mapReady}
+                visible={showDensity}
                 geojson={popGeojson}
-                opacity={0.45}
+                viewMode={popDensityMode}
               />
             )}
             {mapReady && geojson && viewMode === 'grid' && (
@@ -231,17 +252,7 @@ export default function MapPage() {
                   ))}
                 </div>
               )}
-              {showDensity && (
-                <div className={viewMode !== 'grid' && viewMode !== 'point' ? '' : 'border-t border-gray-100 pt-2'}>
-                  <p className="font-semibold text-gray-700 mb-1.5">Dân số</p>
-                  <div className="h-2 rounded-full w-full" style={{
-                    background: 'linear-gradient(to right, #ffffff, #fde68a, #fb923c, #dc2626, #7f1d1d)'
-                  }} />
-                  <div className="flex justify-between text-[10px] text-gray-400 mt-0.5">
-                    <span>Thấp</span><span>Cao</span>
-                  </div>
-                </div>
-              )}
+              {/* Population legend is now rendered by PopulationLayer widget */}
             </div>
           </div>
         </div>

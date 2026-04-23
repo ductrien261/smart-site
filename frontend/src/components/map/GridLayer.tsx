@@ -6,11 +6,11 @@ const FILL_LAYER = 'grid-fill'
 const LINE_LAYER = 'grid-line'
 
 function scoreToColor(score: number): string {
-    if (score >= 80) return '#16a34a'  
-    if (score >= 65) return '#4ade80'  
-    if (score >= 50) return '#facc15'  
-    if (score >= 35) return '#fb923c'  
-    return '#ef4444'                  
+    if (score >= 80) return '#16a34a'
+    if (score >= 65) return '#4ade80'
+    if (score >= 50) return '#facc15'
+    if (score >= 35) return '#fb923c'
+    return '#ef4444'
 }
 
 interface Props {
@@ -61,6 +61,10 @@ export default function GridLayer({ mapInstance, mapReady, geojson, onGridClick 
                     'line-width': 0.5,
                 },
             })
+
+            if (map.getLayer('population-density-fill')) map.moveLayer('population-density-fill')
+            if (map.getLayer('population-density-line')) map.moveLayer('population-density-line')
+            if (map.getLayer('population-heatmap')) map.moveLayer('population-heatmap')
 
             // Click popup
             map.on('click', FILL_LAYER, (e: any) => {
