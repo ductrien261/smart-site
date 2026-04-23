@@ -16,25 +16,11 @@
 
 ---
 
-## 📖 Table of Contents
-
-- [Overview](#-overview)
-- [Features](#-features)
-- [Architecture](#-architecture)
-- [Data Pipeline](#-data-pipeline)
-- [API Reference](#-api-reference)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-- [Environment Variables](#-environment-variables)
-- [Known Limitations](#-known-limitations)
-
----
-
 ## 🔍 Overview
 
-SmartSite is an end-to-end geospatial analytics platform built as a capstone project for the **VKU Engineering Faculty (Semester 6, 2025–2026)**. The system addresses a real-world problem: *how do you objectively evaluate the business potential of an urban location without relying purely on gut instinct?*
+SmartSite is an end-to-end geospatial analytics platform. The system addresses a real-world problem: *how do you objectively evaluate the business potential of an urban location without relying purely on gut instinct?*
 
-The platform ingests multi-source spatial data — including Google Maps café reviews, OpenStreetMap Points of Interest, night-time light (NTL) satellite imagery, and administrative population boundaries — then processes and fuses them into a unified **Grid Score** per 500m² urban cell. Results are surfaced through a modern web application offering four analytical views.
+The platform ingests multi-source spatial data - including Google Maps café reviews, OpenStreetMap Points of Interest, night-time light (NTL) satellite imagery, and administrative population boundaries — then processes and fuses them into a unified **Grid Score** per 500m² urban cell. Results are surfaced through a modern web application offering four analytical views.
 
 **Target cities:** Đà Nẵng · TP. Hồ Chí Minh · Hà Nội
 
@@ -53,7 +39,6 @@ The platform ingests multi-source spatial data — including Google Maps café r
 - **Freehand bounding-box drawing** directly on the map — click two corners to define your region of interest
 - Real-time spatial query against the backend: counts cafés, ratings, sentiment scores, and POI breakdown within the drawn area
 - **Rule-based insight engine**: generates a headline, bullet observations, and a strategic verdict for the selected zone
-- Competition level classification: *No Data / Low / Moderate / High / Very High*
 
 ### 📊 Competition Landscape (`/competition`)
 - City-wide market overview: total grids, total cafés, coverage percentage, max density per cell
@@ -61,7 +46,6 @@ The platform ingests multi-source spatial data — including Google Maps café r
 - **Café density histogram**: distribution of cafés-per-grid across the city
 - **Score histogram**: distribution of composite potential scores
 - District-level ranking table: total cafés, grid coverage %, average score, hotspot count
-- Top 10 most-competitive grids vs. Top 10 untapped opportunity grids (switchable tab)
 
 ### 📈 Executive Overview (`/overview`)
 - Macro KPI dashboard: total cafés indexed, A+ hotspot count, average NTL level, total reviews
