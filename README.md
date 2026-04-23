@@ -10,7 +10,7 @@
 [![Python](https://img.shields.io/badge/Language-Python%203.9+-3776AB?style=flat-square&logo=python)](https://www.python.org)
 [![License](https://img.shields.io/badge/License-Đồ%20Án%20Học%20Thuật-lightgrey?style=flat-square)](/)
 
-> **SmartSite** chuyển đổi dữ liệu không gian địa lý thô thành thông tin kinh doanh có giá trị - giúp nhà đầu tư, doanh nhân và nhà quy hoạch đô thị xác định các địa điểm tiềm năng cao cho các mô hình kinh doanh F&B thông qua chấm điểm không gian theo ô lưới, phân tích POI và trực quan hóa cạnh tranh thị trường.
+**SmartSite** chuyển đổi dữ liệu không gian địa lý thô thành thông tin kinh doanh có giá trị - giúp nhà đầu tư, doanh nhân và nhà quy hoạch đô thị xác định các địa điểm tiềm năng cao cho các mô hình kinh doanh F&B thông qua chấm điểm không gian theo ô lưới, phân tích POI và trực quan hóa cạnh tranh thị trường.
 
 </div>
 
